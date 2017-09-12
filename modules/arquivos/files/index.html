@@ -1,0 +1,249 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Comparação: Apache x Nginx</title>
+	
+</head>
+<body>
+	<h1>Comparação: Apache x Nginx</h1>
+	<section id="Introdução">
+	<h2>Introdução</h2>
+	<p> Por muito tempo Apache dominou o mercado de serviçoes web. Contudo hoje em dia com o surgimento do Nginx
+	que está cada vez mais tomando espaço no mercado, começam a surgir dúvidas sobre qual provedor é o melhor. 
+	Sabemos já que ambos os provedores recebem suporte da comunidade e em fóruns, além de contarem com suportes pagos,
+	da própria Nginx ou de terceirizados no caso do Apache, além disso eles também são muito bem documentados.</p>
+	
+	</section>
+
+	<section id="Nginx">
+		<h2>Nginx</h2>
+		<p> O Nginx surgiu com o desafio de solucionar o problema C10K, que era uma conexão de 10000 clientes simultaneamente em um único servidor.
+			Por o Nginx usar uma arquitetura assincrona direcionada a eventos ele consegue lidar com grandes volumes de conexões.
+			A principal diferença no modelo de eventos é que o Nginx não cria trabalho extra por conexão, fazendo um processo por CPU, o que que maximiza
+			a eficiência do hardware.</p>
+			<p>	
+			Nginx acaba sendo mais usado para VPS, servidores dedicados e clusters para sites de grande tráfico e 
+			com grandes arquivos de mídia. 
+			Para realização de trabalhos estáticos, a perfomance do Nginx é considerada excelente.</p>
+			<li>Assincrono</li>
+			<li>Event-driven</li>
+			<li>Alta escabilidade</li>
+			<li>Bom desempenho para alto volume</li>
+	</section>
+
+	<section id="Apache">
+        <h2>Apache</h2> 
+		<p>	
+			Apache é o servidor web recomendado pelo popular LAMP(Linux, Apache, MySQL e PHP). Ele é rico em funções que são obtíveis através da instalação
+			de um dos 60 modulos oficiais ou ainda dos não oficiais que existem.
+			Ao longo dos anos foi desenvolvido diversos métodos para processar requisições web e a sua eficiência, uma vez que cada vez mais aumenta a
+			necessidade dos servidores suporterem um número mais elevado de requisições em suas páginas web, que também, estão maiores.
+			</p><p>
+			A metodologia de processos do Apache pode ser configurada de três maneiras.
+			Modelo de processo, modelo de trabalhor, ou modelo de eventos. O modelo de processo não escala bem com muitas conexões, já que
+			consome muita RAM e pode acabar recusando conexões sobre carga, não recomendada para sites grandes. O de trabalhor cria um processo de controle
+			que gerencia processos menores, e cada processo menor cria um número de threads, neste método a escala é muito melhor para sites de grande tráfico.
+			O modelo de evento é parecido com o anterior, mas cria apenas uma thread que cria conexões e as passa para um processo de trabalho, o que faz aguentar
+			longas conexões com mais eficiência em uma única thread.</p>
+			<p>
+			Por fim o servidor Apache possuí suporte mais completo para sistemas Unix e Windows e ajudam os
+			usuários a preferirem a conviniência do Apache, somado ao .htacess e seus suportes a dinamicidade.
+			</p>			
+			<li>Muitas funções</li>
+			<li>Process-based</li>
+			<li>Lida bem com dinamicidade</li>
+			<li>Bom processamento de PHP</li>			
+	
+	</section>
+	
+	<section id="Conclusão">
+		<h2>Conclusão</h2>
+		<p>
+			Em vista os benefícios de escabilidade e simplicidade do Nginx, tanto para sites menores quanto maiores, acreditamos que ele seja mais eficiente.
+			O Apache tem mais de mil diferentes funcionalidades, mas os principais são seis, as quais são as únicas seis que o Nginx possuí, garantindo
+			um maior foco e	consequentemente melhor desempenho.</p>
+			<p>
+			Porém, sempre é bom lembrar que o melhor provedor é sempre aquele que atende todas, ou, a maioria das necessidades do usuário. Estas que se forem de
+			necessidade, devem recorrer a utilização de um provendor que as atenda, seja Apache ou Nginx.
+		</p>
+		<h3>Referência</h3>
+		<p>NGINX vs. Apache (Pro/Con Review, Uses, & Hosting for Each) </br> <a href= "http://www.hostingadvice.com/how-to/nginx-vs-apache/" target="_blank" >http://www.hostingadvice.com/how-to/nginx-vs-apache/</a></p>
+	</section>
+	
+	
+	<section id="tutorial">
+		<h2>Tutorial de Provisionamento</h2>
+		<p>Para o provisionamento desta máquina foi utilizado os softwares Vagrant e 			Puppet no entuito de construir uma box com o sistema operacional ubuntu 12.04 que 			rode um servidor de web-service, no caso o Nginx.
+		</p>
+		<p>Para instalação, seguimos os seguintes passos:
+		Levando em consideração que o Vagrant e o Puppet já estão instalados na máquina e 			o precise64 previamente baixado para facilitar a execução do tutorial.
+		</p>
+		<h5>Passo 1: Construindo o arquivo do VagrantFile</h5>
+		<p>Abra seu editor de texto favorito e crie um arquivo com o nome VagrantFile.</br>
+		Esse arquivo é responsável pela configuração inicial do Vagrant. <br>
+		O codigo abaixo é o utilizado neste trabalho.
+		</p>
+		<pre>
+		<code>
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+# Define parâmetros no VirtualBox 
+ config.vm.provider "virtualbox" do |v|
+  v.gui = false
+  v.name = "prt"
+  v.memory = 2048
+  v.cpus = 2
+end 
+
+# Define nome no comando Vagrant global-status
+config.vm.define "PRT"
+
+ # Eu uso o precise64, mas caso tenha problemas use o precise32 alterando a linha a baixo 
+ # e baixando o mesmo pelo link que consta no arquivo dicas.txt
+ # 
+ config.vm.box = "hashicorp/precise64"
+ config.vm.box_url = "file:///home/dodozaum/Vagrant_Ngix/precise64.box"
+
+ #config.vm.box_url = "file:///Users/paulosausen/ubuntu/precise64/precise32.box"
+
+config.vm.network :private_network, ip: "192.168.12.123"
+
+# Define o path para os diretórios puppet, os diretórios/arquivos devem estar criados antes
+config.vm.provision :puppet do |puppet|
+         puppet.manifests_path = "manifests"
+         puppet.module_path = "modules"
+         puppet.options = ['--verbose']
+    end
+  
+config.vm.post_up_message = "Seu ambiente está pronto. Aponte seu browser para ht\
+tp://192.168.12.123 para acessar a aplicação."
+end
+		</code>
+		</pre>
+
+		<h5>Passo 2: Estrutura de diretórios</h5>
+		<p>
+		Para continuar precisamos criar a seguinte estrutura de arquivos.
+		</p>
+		<pre>
+		<code>
+				.
+				├── manifests
+				│   └── default.pp
+				├── modules
+				│  	├── arquivos
+				│   │   ├── files
+				│   │   │   ├── index.html
+				│   │   │   ├── mensagem
+				│   │   └── manifests
+				│   │       └── init.pp
+				│   ├── nginx
+				│   │   └── manifests
+				│   │       └── init.pp
+				│   └── system-update
+				│       └── manifests
+				│           └── init.pp
+				├── precise64.box
+				└── Vagrantfile
+
+				9 directories, 9 files
+		</code>
+		</pre>
+		<h5>Passo 3: Configurando o arquivo default.pp</h5>
+		<p>Esse arquivo é responsável por fazer o provisionamento através do Puppet</p>
+			<pre>
+			<code>
+
+Exec { path => [ "/usr/bin:/usr/sbin:/bin:/usr/local/bin:/usr/local/sbin:/sbin" ] }
+
+package { [
+    'vim',
+    'byobu',
+    'htop',
+    'links'
+  ]:
+  require => Class["system-update"],
+  ensure  => 'installed',
+}
+	
+include system-update
+include nginx
+include arquivos
+			</pre>
+			</code>
+<p>A primeria linha deste arquivo irá executar a criação das variavéis de ambiente do Linux. Logo após o comando package providencia a instalação da lista de pacotes, para tal o comando require garante que essa instação ocorrá somente se a classe system-update tenha sido previamente instalada. Por fim são incluídas as classes com o comando include.</p>
+		<h5>Passo 4: Classe system-update</h5>
+		<p>Essa classe será responsável por garantir uma atualização no sistema operacional da box no precise64.</p>
+		<pre><code>
+class system-update {
+	
+    exec { 'apt-get update':
+    command => 'apt-get update',
+  }
+
+  $sysPackages = [ "build-essential" ]
+  package { $sysPackages:
+    ensure => "installed",
+    require => Exec['apt-get update'],
+  }
+}
+</pre></code>
+<p>Do mesmo medo o comando exec executa os comandos Unix que garantem o update</p>
+		<h5>Passo 5: Classe Nginx</h5>
+		<p>Esta classe é responsável por instalar o serviço principal do web-service Nginx.</p>
+<pre><code>
+class nginx {
+
+  package { "nginx":
+    ensure  => present,
+    require => Class["system-update"],
+  }
+
+  service { "nginx":
+    ensure  => "running",
+    require => Package["nginx"],
+  }
+
+}
+</pre></code>
+<p>O comando package assegura a instalação somente após a atualização do sistema.
+Já o comando service garante que o pacote Nginx esteja rodando no ambiente da box.</p>
+
+<h5>Passo 6: Classe Arquivos</h5>
+		<p>Esta classe é responsável por copiar o index padrão deste tutorial para o endereço padrão que o serviço do Nginx utiliza para gerenciar os sites disponíveis.</p>
+<pre><code>
+class arquivos {
+	
+file {'/usr/share/nginx/www/index.html':
+     ensure => file,
+	require => Class["nginx"],
+     owner  => 'root',
+     group  => 'root',
+     mode   => '0644',
+     source => 'puppet:///modules/arquivos/index.html',
+   } 
+	
+file {'/etc/motd.tail':
+     ensure => file,
+     owner  => 'root',
+     group  => 'root',
+     mode   => '0644',
+     source => 'puppet:///modules/arquivos/mensagem',
+   } 
+
+}
+</pre></code>
+<p>O primeiro comando file move o index.html da pasta file para a pasta padrão do Nginx, somente se a classe Nginx já estiver instalada. O segundo comando file move o arquivo de mensagem da pasta file para o /etc/motd.tail, este que é utilizado para exibir uma mensagem de boas-vindas ao logar na máquina.</p>
+
+	</section>
+
+<footer>
+<b> Sistema implementado na disciplina de Redes 2 pelos alunos:
+Pablo, Rodolfo e Thainan.</b>
+
+</footer>
+</body>
+</html>
