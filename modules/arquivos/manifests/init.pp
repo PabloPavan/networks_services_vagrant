@@ -1,12 +1,12 @@
 class arquivos {
 	
-file {'/usr/share/nginx/www/index.html':
+file {'/usr/share/nginx/www/site.tar':
      ensure => file,
 	 require => Class["nginx"],
      owner  => 'root',
      group  => 'root',
      mode   => '0644',
-     source => 'puppet:///modules/arquivos/index.html',
+     source => 'puppet:///modules/arquivos/site.tar',
    } 
 
 file {'/etc/squid3/squid.conf':
