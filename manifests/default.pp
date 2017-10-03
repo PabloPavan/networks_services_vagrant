@@ -3,8 +3,6 @@ Exec { path => [ "/usr/bin:/usr/sbin:/bin:/usr/local/bin:/usr/local/sbin:/sbin" 
 
 package { [
     'vim',
-    'byobu',
-    'htop',
     'links'
   ]:
   require => Class["system-update"],
@@ -13,6 +11,6 @@ package { [
 	
 include system-update
 include nginx
+include squid
 include arquivos
-
-
+include features
